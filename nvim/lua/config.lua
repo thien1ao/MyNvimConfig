@@ -1,0 +1,402 @@
+-- treesitter
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all"
+  ensure_installed = { "c", "arduino", "cpp", "rust", "python", "markdown", "rst", "lua", "vim", "json", "cmake" },
+  sync_install = false,
+  auto_install = true,
+  ignore_install = { "fortran", "latex", "markdown" },
+  highlight = {
+    enable = true,
+    disable = { "fortran", "latex", "markdown"},
+    additional_vim_regex_highlighting = false,
+  }
+}
+-- nvim-tree setup
+require'nvim-tree'.setup {}
+
+-- trouble setup
+require'trouble'.setup{}
+
+-- telescope.nvim setup
+local actions = require('telescope.actions')
+require'telescope'.setup{
+  defaults = {
+    preview = {
+      treesitter = {
+        enable = false
+      }
+    },
+    file_ignore_patterns = { "^build/", "build/", "/build/", "/target/", "target/" }
+  }
+}
+
+--- lualine settings
+require'lualine'.setup{
+    options = {
+        theme = 'auto',
+        icons_enabled = true,
+        }
+}
+
+--- tabline settings
+require("tabline").setup{
+    enable = true,
+    tabline_show_devicons = true,
+}
+
+--- Window switch swap-buffers settings
+require('swap-buffers').setup({
+  ignore_filetypes = {'NvimTree'}
+})
+
+-- alpha-config
+local status_ok, alpha = pcall(require, "alpha")
+if not status_ok then
+ return
+end
+
+local dashboard = require("alpha.themes.dashboard")
+dashboard.section.header.val = {
+	[[  ███▄    █ ▓█████  ▒█████   ██▒   █▓ ██▓ ███▄ ▄███▓]],
+	[[  ██ ▀█   █ ▓█   ▀ ▒██▒  ██▒▓██░   █▒▓██▒▓██▒▀█▀ ██▒]],
+	[[ ▓██  ▀█ ██▒▒███   ▒██░  ██▒ ▓██  █▒░▒██▒▓██    ▓██░]],
+	[[ ▓██▒  ▐▌██▒▒▓█  ▄ ▒██   ██░  ▒██ █░░░██░▒██    ▒██]],
+	[[ ▒██░   ▓██░░▒████▒░ ████▓▒░   ▒▀█░  ░██░▒██▒   ░██▒]],
+	[[ ░ ▒░   ▒ ▒ ░░ ▒░ ░░ ▒░▒░▒░    ░ ▐░  ░▓  ░ ▒░   ░  ░]],
+	[[ ░ ░░   ░ ▒░ ░ ░  ░  ░ ▒ ▒░    ░ ░░   ▒ ░░  ░      ░]],
+	[[    ░   ░ ░    ░   ░ ░ ░ ▒       ░░   ▒ ░░      ░]],
+	[[          ░    ░  ░    ░ ░        ░   ░         ░]],
+	[[                                 ░]],
+}
+dashboard.section.buttons.val = {
+   dashboard.button("f", "  Find file", ":Telescope find_files <CR>"),
+   dashboard.button("e", "  New file", ":ene <BAR> startinsert <CR>"),
+   dashboard.button("r", "  Recently used files", ":Telescope oldfiles <CR>"),
+   dashboard.button("t", "  Find text", ":Telescope live_grep <CR>"),
+   dashboard.button("c", "  Configuration", ":e ~/.config/nvim/init.vim<CR>"),
+   dashboard.button("q", "  Quit Neovim", ":qa<CR>"),
+}
+
+
+dashboard.section.footer.opts.hl = "Type"
+dashboard.section.header.opts.hl = "Include"
+dashboard.section.buttons.opts.hl = "Keyword"
+
+dashboard.opts.opts.noautocmd = true
+alpha.setup(dashboard.opts)
+
+-- Arduino setup (PUT IT HERE)
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "arduino",
+  callback = function()
+    require("Arduino-Nvim")
+  end,
+})
+
+-- luasnip setup
+local luasnip = require 'luasnip'
+require("luasnip/loaders/from_vscode").load(
+    {paths={'~/.config/nvim/my_lsp_snips'}}
+)
+
+-- utility functions
+-- from: https://www.reddit.com/r/neovim/comments/1hfotru/nvimcmp_super_tab_in_blink/
+local send_tab_key = function()
+  local tab_key = vim.api.nvim_replace_termcodes("<Tab>", true, true, true)
+  vim.api.nvim_feedkeys(tab_key, "n", true)
+end
+local has_words_before = function()
+  unpack = unpack or table.unpack
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+end
+local has_words_before_short = function()
+  local ln = vim.api.nvim_get_current_line()
+  if ln:match("^%s*$") then
+    return false
+  else
+    return true
+  end
+end
+
+
+-- blink.nvim setup
+require('blink.cmp').setup({
+    completion = {
+      menu = {
+        auto_show = true,
+      },
+      list = {
+        selection = {
+          preselect = false,
+          auto_insert = true,
+        },
+      },
+      ghost_text = {
+        enabled = false,
+        show_without_selection = false,
+      },
+      accept = {
+        auto_brackets = {
+          enabled = false,
+          kind_resolution = {
+            enabled = false,
+          },
+        },
+      },
+      trigger = {
+          show_on_trigger_character = true,
+          show_on_insert_on_trigger_character = true,
+          show_on_accept_on_trigger_character = true,
+          show_on_blocked_trigger_characters = { ' ', '\n', '\t' },
+--           prefetch_on_insert = true,
+--           show_in_snippet = true,
+--           show_on_keyword = true,
+--           -- You can also block per filetype with a function:
+--           -- show_on_blocked_trigger_characters = function(ctx)
+--           --   if vim.bo.filetype == 'markdown' then return { ' ', '\n', '\t', '.', '/', '(', '[' } end
+--           --   return { ' ', '\n', '\t' }
+--           -- end,
+--           show_on_x_blocked_trigger_characters = { "'", '"', '(' },
+      },
+    },
+    -- custom tab to cycle config
+
+    keymap = {
+      ['<Tab>'] = {
+        function(cmp)
+          if cmp.snippet_active() then return cmp.accept()
+          elseif has_words_before() and not cmp.is_visible() then return cmp.show()
+          elseif cmp.is_visible() then return cmp.select_next()
+          else return send_tab_key() end
+        end,
+        'snippet_forward',
+        'fallback'
+      },
+      ['<S-Tab>'] = { 'snippet_backward', 'fallback' },
+      -- press Enter to accept suggestion
+      ['<CR>'] = { 'accept', 'snippet_forward', 'fallback' },
+      ['<Up>'] = { 'select_prev', 'fallback' },
+      ['<Down>'] = { 'select_next', 'fallback' },
+      ['<C-p>'] = { 'select_prev', 'fallback_to_mappings' },
+      ['<C-n>'] = { 'select_next', 'fallback_to_mappings' },
+      ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
+      ['<C-e>'] = { 'hide', 'fallback' },
+    },
+    appearance = {
+      use_nvim_cmp_as_default = true,
+    },
+    sources = {
+      default = { 'lsp', 'path', 'snippets', 'buffer' },
+    },
+    signature = { enabled = true },
+    fuzzy = { implementation = "prefer_rust_with_warning" }
+    -- fuzzy = { implementation = "lua" }
+})
+
+-- Add additional capabilities supported by nvim-cmp
+-- local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local nvim_capabilities = vim.lsp.protocol.make_client_capabilities()
+local capabilities = require('blink.cmp').get_lsp_capabilities(nvim_capabilities)
+
+-- lspconfig
+local lspconfig = require('lspconfig')
+
+-- Enable some language servers with the additional completion capabilities offered by nvim-cmp
+--
+-- python language server settings
+vim.lsp.config('jedi_language_server', {
+  cmd = { vim.fn.expand('~/anaconda3/bin/jedi-language-server') },
+  capabilities = capabilities,
+})
+vim.lsp.enable('jedi_language_server')
+-- vim.lsp.config('ty', {capabilities=capabilities})
+-- vim.lsp.enable('ty')
+
+-- python linting language server
+-- lspconfig.ruff.setup{
+vim.lsp.config('ruff',
+{
+  cmd = { vim.fn.expand('~/anaconda3/bin/ruff'), 'server' },
+  init_options = {
+    settings = {
+      -- Any extra CLI arguments for `ruff` go here.
+      args = {},
+    }
+  },
+  capabilities = capabilities,
+})
+vim.lsp.enable('ruff')
+
+-- lspconfig.pyright.setup{capabilities = capabilities}
+-- fortran language server settings
+vim.lsp.config('fortls',
+{
+    cmd = {
+        'fortls',
+        '--autocomplete_name_only',
+        '--incrmental_sync'
+    },
+    settings = {
+        ["fortran-ls"] = {
+            variableHover = false
+        },
+    },
+    root_dir = vim.fn.FindTopLevelProjectDir,
+    capabilities = capabilities,
+})
+vim.lsp.enable('fortls')
+
+-- cpp language server settings
+vim.lsp.config('clangd',
+{
+    cmd = {vim.fn.FindClangExe()},
+    capabilities = capabilities,
+})
+vim.lsp.enable('clangd')
+
+-- cmake (CMakeLists.txt / *.cmake): prefer neocmakelsp, fall back to cmake-language-server
+if vim.fn.executable('neocmakelsp') == 1 then
+  vim.lsp.config('neocmake', {capabilities = capabilities})
+  vim.lsp.enable('neocmake')
+elseif vim.fn.executable('cmake-language-server') == 1 then
+  vim.lsp.config('cmake', {capabilities = capabilities})
+  vim.lsp.enable('cmake')
+end
+
+-- rust
+vim.lsp.config('rust_analyzer',
+{
+    capabilities = capabilities,
+})
+vim.lsp.enable('rust_analyzer')
+
+-- Set completeopt to have a better completion experience
+vim.o.completeopt = 'menu,menuone,noselect'
+vim.o.pumheight = 15
+
+-- null-ls for adapting lang linters into language servers
+local null_ls = require("null-ls")
+local null_ls_sources = {
+}
+null_ls.setup({sources = null_ls_sources})
+
+-- disable all lsp diagnostic virtual text to reduce noise
+vim.diagnostic.config(
+  {
+    virtual_text = false,
+    underline = false,
+    float = { source = true },
+  }
+)
+-- vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+--     vim.lsp.diagnostic.on_publish_diagnostics, {
+--         virtual_text = false,
+--         signs = true,
+--     }
+-- )
+
+-- Extra legacy vim plugin settings
+-- TODO: convert to lua settings
+vim.cmd([[
+" Vimtex settings
+" Note; <leader>ll builds and <leader>le shows compile errors
+" Note; install xdotool package for live previews in zathura
+" let g:vimtex_view_method='zathura'
+" let g:vimtex_view_method='general'
+
+" NvimTree settings
+nnoremap <leader>e :NvimTreeToggle<CR>
+let g:nvim_tree_auto_open = 1
+let g:nvim_tree_show_icons = {
+    \ 'git': 1,
+    \ 'folders': 0,
+    \ 'files': 0,
+    \ 'folder_arrows': 0,
+    \ }
+
+" Easy align settings
+xmap ga <Plug>(EasyAlign)
+nmap ga <Plug>(EasyAlign)
+
+" QFEnter settings
+let g:qfenter_keymap = {}
+let g:qfenter_keymap.hopen = ['<Leader><Space>', '<C-x>']
+let g:qfenter_keymap.vopen = ['<Leader><CR>', '<C-v>']
+
+" quick-scope
+let g:qs_highlight_on_keys = ['f', 'F']
+
+" telescope mappings
+nnoremap <leader>* :execute 'Telescope live_grep default_text=' . expand('<cword>')<cr><esc>
+nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<CR>
+nnoremap <C-f>      <cmd>lua require('telescope.builtin').live_grep()<CR>
+nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<CR>
+nnoremap <C-b>      <cmd>lua require('telescope.builtin').buffers()<CR>
+nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<CR>
+nnoremap <C-p>      <cmd>lua require('telescope.builtin').find_files()<CR>
+nnoremap <leader>fd <cmd>lua require('telescope.builtin').lsp_definitions()<CR>
+nnoremap <leader>fr <cmd>lua require('telescope.builtin').lsp_references()<CR>
+nnoremap <leader>fi <cmd>lua require('telescope.builtin').diagnostics()<CR>
+
+" On hover show diagnostic (if any) or use <leader>di to force diagnostic popup
+autocmd CursorHold * lua vim.diagnostic.open_float()
+nnoremap <leader>di  <cmd>lua vim.diagnostic.open_float()<CR>
+nnoremap <leader>xd  <cmd>TroubleToggle document_diagnostics<cr>
+
+" nvim-lsp mappings
+" note: <C-o> go back previous pos, <C-i> forward to last pos
+nnoremap <silent> gd    <cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap <silent> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap <silent> <c-s> <cmd>lua vim.lsp.buf.signature_help()<CR>
+nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
+
+nnoremap <silent> gD    <cmd>lua vim.lsp.buf.declaration()<CR>
+nnoremap <silent> gI    <cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap <silent> gT   <cmd>lua vim.lsp.buf.type_definition()<CR>
+nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
+nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+
+" format whole file (normal) or selection (visual) via LSP (clangd -> clang-format)
+nnoremap <silent> <leader>fm <cmd>lua vim.lsp.buf.format({async = true})<CR>
+xnoremap <silent> <leader>fm <cmd>lua vim.lsp.buf.format({async = true})<CR><Esc>
+
+" alias to check loaded lsp client status
+cnoreabbrev lspstat lua print(vim.inspect(vim.lsp.buf_get_clients()))
+
+" vim-dispatch settings
+" Run :Make! to launch background async project build.
+" Results are available via :Copen
+" Ensure makeprg is set properly before running
+
+" set default grepprg to ripgrep if on $PATH
+if executable('rg')
+  set grepprg=rg\ --vimgrep
+endif
+
+" vim-grepper settings
+let g:grepper = {
+    \ 'tools': ['rg', 'git', 'grep', 'rgproj'],
+    \ 'rgproj': {
+    \   'grepprg':    'rg -n $* -- `git rev-parse --show-toplevel`',
+    \ }}
+if executable('rg')
+    let g:grepper.rgproj = { 'grepprg': 'rg -n $* -- `git rev-parse --show-toplevel`' }
+else
+    let g:grepper.rgproj = { 'grepprg': 'git grep -nI $* -- `git rev-parse --show-toplevel`' }
+endif
+" Project wide search with <leader>*
+" nnoremap <leader>* :Grepper -tool rgproj -cword -noprompt<cr>
+" Project wide search with :vg <cr>
+cnoreabbrev vg Grepper -tool rgproj <cr>
+
+" swap-buffers
+nnoremap <C-Left> <cmd>lua require('swap-buffers').swap_buffers('h')<CR>
+nnoremap <C-Down> <cmd>lua require('swap-buffers').swap_buffers('j')<CR>
+nnoremap <C-Up> <cmd>lua require('swap-buffers').swap_buffers('k')<CR>
+nnoremap <C-Right> <cmd>lua require('swap-buffers').swap_buffers('l')<CR>
+
+" tagbar
+nnoremap <leader>tt :TagbarToggle<CR>
+]])
