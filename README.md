@@ -1,15 +1,11 @@
 # Mike's dotfiles
 
-Neovim + Alacritty, darkvoid colorscheme, JetBrainsMono Nerd Font.
 
 <table>
   <tr>
     <td width="50%"><img src="screenshots/dashboard.png" alt="Neovim dashboard"></td>
     <td width="50%"><img src="screenshots/code.png" alt="Editing with file tree and splits"></td>
   </tr>
-  <tr>
-    <td align="center"><b>Dashboard</b> (alpha-nvim)</td>
-    <td align="center"><b>Editing</b>: nvim-tree, splits, LSP, lualine</td>
   </tr>
   <tr>
     <td width="50%"><img src="screenshots/telescope.png" alt="Telescope file finder"></td>
