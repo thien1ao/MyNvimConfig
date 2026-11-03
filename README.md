@@ -1,11 +1,23 @@
-# dotfiles
+# Mike's dotfiles
 
-Configs for Neovim and Alacritty.
+Neovim + Alacritty, darkvoid colorscheme, JetBrainsMono Nerd Font.
 
-```bash
-git clone <this repo> ~/dotfiles
-~/dotfiles/install.sh   # symlinks ~/.config/nvim and ~/.config/alacritty here
-```
+<table>
+  <tr>
+    <td width="50%"><img src="screenshots/dashboard.png" alt="Neovim dashboard"></td>
+    <td width="50%"><img src="screenshots/code.png" alt="Editing with file tree and splits"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Dashboard</b> (alpha-nvim)</td>
+    <td align="center"><b>Editing</b>: nvim-tree, splits, LSP, lualine</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/telescope.png" alt="Telescope file finder"></td>
+    <td width="50%"><img src="screenshots/terminal.png" alt="Alacritty terminal"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Telescope</b> file finder (<code>,ff</code> / <code>Ctrl+p</code>)</td>
+    <td align="center"><b>Alacritty</b></td>
+  </tr>
+</table>
 
-Existing configs are moved aside to `*.bak-<timestamp>`, not deleted.
-Fonts: Alacritty expects *JetBrainsMono Nerd Font*. Neovim plugins install on first launch via lazy.nvim.

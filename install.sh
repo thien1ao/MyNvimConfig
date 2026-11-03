@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Symlink configs from this repo into ~/.config. Existing configs are moved to <name>.bak-<timestamp>.
 set -euo pipefail
 DOTFILES="$(cd "$(dirname "$0")" && pwd)"
 STAMP="$(date +%Y%m%d-%H%M%S)"

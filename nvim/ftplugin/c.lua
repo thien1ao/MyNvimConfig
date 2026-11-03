@@ -1,0 +1,6 @@
+-- also used for C++ (Neovim's cpp ftplugin runs ftplugin/c.lua)
+local util = require('util')
+util.code(2)
+util.indent_folds()
+util.set_makeprg('/build')
+vim.keymap.set('n', [[\l]], '<cmd>copen<CR>', { buffer = true, desc = 'Build errors' })
