@@ -130,10 +130,13 @@ require('config')
 -- Colorscheme
 -- colorscheme darkvoid
 vim.cmd([[
-set mouse=
+set mouse=a
 set background=dark
 set termguicolors
 ]])
+
+-- Ctrl+C copies the visual selection to the system clipboard
+vim.keymap.set('v', '<C-c>', '"+y', { desc = 'Copy to system clipboard' })
 
 
 -- Load the colorscheme
@@ -142,6 +145,19 @@ require('darkvoid').setup({
   transparent = true,
   glow = false,
   show_end_of_buffer = true,
+  -- darkvoid's default syntax palette is all greys, which looks like no
+  -- highlighting at all; give the main groups distinct muted colors
+  colors = {
+    kw = "#c792ea",          -- keywords: def, return, if, import
+    func = "#82aaff",        -- function names / calls
+    string = "#a8c97f",      -- strings
+    type = "#e5c07b",        -- classes / types
+    type_builtin = "#e5c07b",
+    identifier = "#c0c0c0",  -- variables
+    constant = "#f78c6c",    -- numbers / constants
+    bool = "#f78c6c",
+    preprocessor = "#89ddff",-- decorators
+  },
 })
 vim.cmd('colorscheme darkvoid')
 

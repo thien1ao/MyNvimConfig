@@ -93,11 +93,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- luasnip setup
-local luasnip = require 'luasnip'
-require("luasnip/loaders/from_vscode").load(
-    {paths={'~/.config/nvim/my_lsp_snips'}}
-)
 
 -- utility functions
 -- from: https://www.reddit.com/r/neovim/comments/1hfotru/nvimcmp_super_tab_in_blink/
@@ -206,7 +201,9 @@ local lspconfig = require('lspconfig')
 --
 -- python language server settings
 vim.lsp.config('jedi_language_server', {
-  cmd = { vim.fn.expand('~/anaconda3/bin/jedi-language-server') },
+  cmd = { 'jedi-language-server' },
+  -- jedi runs in its own pipx venv; point it at the active (conda) python so imports like numpy resolve
+  init_options = { workspace = { environmentPath = vim.fn.exepath('python3') } },
   capabilities = capabilities,
 })
 vim.lsp.enable('jedi_language_server')
@@ -217,7 +214,7 @@ vim.lsp.enable('jedi_language_server')
 -- lspconfig.ruff.setup{
 vim.lsp.config('ruff',
 {
-  cmd = { vim.fn.expand('~/anaconda3/bin/ruff'), 'server' },
+  cmd = { 'ruff', 'server' },
   init_options = {
     settings = {
       -- Any extra CLI arguments for `ruff` go here.
