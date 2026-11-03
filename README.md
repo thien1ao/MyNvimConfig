@@ -11,9 +11,5 @@
     <td width="50%"><img src="screenshots/telescope.png" alt="Telescope file finder"></td>
     <td width="50%"><img src="screenshots/terminal.png" alt="Alacritty terminal"></td>
   </tr>
-  <tr>
-    <td align="center"><b>Telescope</b> file finder (<code>,ff</code> / <code>Ctrl+p</code>)</td>
-    <td align="center"><b>Alacritty</b></td>
-  </tr>
 </table>
 
